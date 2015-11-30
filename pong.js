@@ -11,11 +11,11 @@ var height = 600;
 canvas.width = width;
 canvas.height = height;
 var context = canvas.getContext('2d');
+var keysDown = {};
 
-window.onload = function() {
-	document.body.appendChild(canvas);
-	animate(step);
-};
+var player = new Player();
+var computer = new Computer();
+var ball = new Ball(200, 300);
 
 var step = function() {
 	update();
@@ -27,8 +27,53 @@ var update = function() {
 	player.update();
 	computer.update(ball);
 	ball.update(player.paddle, computer.paddle);
-
 };
+
+var render = function() {
+	context.fillStyle = "#FF00FF";
+	context.fillRect(0, 0, width, height);
+	player.render();
+	computer.render();
+	ball.render();
+};
+
+function Paddle(x, y, width, height) {
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+	this.x_speed = 0;
+	this.y_speed = 0;
+}
+
+Paddle.prototype.render = function() {
+	context.fillStyle = "#0000FF";
+	context.fillRect(this.x, this.y, this.width, this.height);
+};
+
+function Player() {
+	this.paddle = new Paddle(175, 580, 50, 10);
+}
+
+Player.prototype.render = function () {
+	this.paddle.render();
+};
+
+function Computer() {
+	this.paddle = new Paddle(175, 10, 50, 10);
+}
+
+Computer.prototype.render = function () {
+	this.paddle.render();
+};
+
+function Ball(x, y) {
+	this.x = x;
+	this.y = y;
+	this.x_speed = 0;
+	this.y_speed = 3;
+	this.radius = 5;
+}
 
 Player.prototype.update = function() {
 	for (var key in keysDown) {
@@ -114,60 +159,6 @@ Computer.prototype.update = function(ball) {
 	}
 };
 
-var render = function() {
-	context.fillStyle = "#FF00FF";
-	context.fillRect(0, 0, width, height);
-
-	var player = new Player();
-	var computer = new Computer();
-	var ball = new Ball(200, 300);
-
-	var render = function() {
-		context.fillStyle = "#FF00FF";
-		context.fillRect(0, 0, width, height);
-		player.render();
-		computer.render();
-		ball.render();
-	};
-};
-
-function Paddle(x, y, width, height) {
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.x_speed = 0;
-	this.y_speed = 0;
-}
-
-Paddle.prototype.render = function() {
-	context.fillStyle = "#0000FF";
-	context.fillRect(this.x, this.y, this.width, this.height);
-};
-
-function Player() {
-	this.paddle = new Paddle(175, 580, 50, 10);
-}
-
-Player.prototype.render = function () {
-	this.paddle.render();
-};
-
-function Computer() {
-	this.paddle = new Paddle(175, 10, 50, 10);
-}
-
-Computer.prototype.render = function () {
-	this.paddle.render();
-};
-
-function Ball(x, y) {
-	this.x = x;
-	this.y = y;
-	this.x_speed = 0;
-	this.y_speed = 3;
-	this.radius = 5;
-}
 
 Ball.prototype.render = function () {
 	context.beginPath();
@@ -176,7 +167,6 @@ Ball.prototype.render = function () {
 	context.fill();
 };
 
-var keysDown = {};
 
 window.addEventListener("keydown", function(event) {
 	keysDown[event.keyCode] = true;
@@ -186,3 +176,7 @@ window.addEventListener("keyup", function(event) {
 	delete keysDown[event.keyCode];
 });
 
+window.onload = function() {
+	document.body.appendChild(canvas);
+	animate(step);
+};
